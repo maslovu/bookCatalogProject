@@ -51,7 +51,7 @@ public class CommentServiceImpl implements CommentService {
     @Transactional(readOnly = true)
     public List<CommentDto> getAllCommentForBook(long bookId) {
         log.info("Getting comments for book with id: {}", bookId);
-        return commentRepo.getCommentsForBookByBookId(bookId).stream()
+        return commentRepo.findByBookId(bookId).stream()
                 .map(mapper::toDto).toList();
     }
 

@@ -51,10 +51,7 @@ public class BookServiceImpl implements BookService {
 
         Book savedEntity = bookRepo.save(bookEntity);
 
-        Book freshCopy = bookRepo.findById(savedEntity.getId())
-                .orElseThrow(() -> new IllegalStateException("Книга исчезла сразу после сохранения"));
-
-        return mapper.toDto(freshCopy);
+        return mapper.toDto(savedEntity);
     }
 
     @EvictBookCache

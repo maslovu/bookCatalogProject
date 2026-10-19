@@ -14,7 +14,4 @@ public interface CommentMapper {
 
     @Mapping(target = "bookId", source = "book.id")
     CommentDto toDto(Comment request);
-
-    @Mapping(source = "bookId", target = "book.id")
-    Comment toEntity(CommentDto dto);
 }

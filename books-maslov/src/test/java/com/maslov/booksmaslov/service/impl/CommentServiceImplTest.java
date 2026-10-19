@@ -87,7 +87,7 @@ class CommentServiceImplTest {
         CommentDto dto1 = new CommentDto(1L, "Nice!", 3L);
         CommentDto dto2 = new CommentDto(2L, "Bad...", 3L);
 
-        given(commentRepo.getCommentsForBookByBookId(bookId)).willReturn(dbResponse);
+        given(commentRepo.findByBookId(bookId)).willReturn(dbResponse);
 
         given(mapper.toDto(c1)).willReturn(dto1);
         given(mapper.toDto(c2)).willReturn(dto2);
@@ -101,7 +101,7 @@ class CommentServiceImplTest {
         assertEquals("Nice!", result.get(0).text());
         assertEquals("Bad...", result.get(1).text());
 
-        verify(commentRepo).getCommentsForBookByBookId(bookId);
+        verify(commentRepo).findByBookId(bookId);
         verify(mapper).toDto(c1);
         verify(mapper).toDto(c2);
     }
@@ -110,7 +110,7 @@ class CommentServiceImplTest {
     void getAllCommentForBook_NoComments_ReturnsEmptyList() {
         // Given
         long bookId = 99L;
-        given(commentRepo.getCommentsForBookByBookId(bookId))
+        given(commentRepo.findByBookId(bookId))
                 .willReturn(Collections.emptyList());
 
         // When
@@ -122,7 +122,7 @@ class CommentServiceImplTest {
         // Объект списка должен существовать
         assertTrue(result.isEmpty());
 
-        verify(commentRepo).getCommentsForBookByBookId(bookId);
+        verify(commentRepo).findByBookId(bookId);
         verify(mapper, never()).toDto(any()); // Маппер не должен вызываться ни разу
     }
 

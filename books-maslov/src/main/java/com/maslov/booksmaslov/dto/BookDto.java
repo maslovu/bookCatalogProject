@@ -15,8 +15,4 @@ public record BookDto(
         @NotBlank String authors,
         @NotNull @ExistingId(entityClass = YearOfPublish.class) Long yearId,
         @NotNull @ExistingId(entityClass = Genre.class) Long genreId) implements Serializable {
-
-    @JsonCreator
-    public BookDto {
-    }
 }
