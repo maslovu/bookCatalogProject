@@ -143,7 +143,8 @@ class CommentServiceImplTest {
 
         verify(bookRepo).findById(bookId);
         verify(commentRepo).save(any(Comment.class));
-        verify(mapper).toDto(savedComment); }
+        verify(mapper).toDto(savedComment);
+    }
 
     @Test
     void createComment_WhenBookDoesNotExist_ShouldThrowResourceNotFoundException() {
@@ -237,8 +238,6 @@ class CommentServiceImplTest {
         long id = 1L;
         String inputText = "New content";
         CommentRequest request = new CommentRequest(inputText);
-//        CommentEvent event = new CommentEvent(inputText);
-//        event.setComment(inputText);
 
         Comment dbComment = new Comment("Initial");
         dbComment.setId(id);
@@ -282,7 +281,6 @@ class CommentServiceImplTest {
         // Then: Проверяем изменение состояния IN-MEMORY объектов
         assertTrue(parentBook.getComments().isEmpty(), "Коллекция комментариев книги должна стать пустой");
         assertNull(targetComment.getBook(), "Ссылка на книгу внутри комментария должна быть очищена");
-        // Примечание: вторая проверка пройдет только если ваш remove логика включает .setBook(null)
     }
 
     @Test

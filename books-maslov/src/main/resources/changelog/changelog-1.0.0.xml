@@ -6,25 +6,25 @@
     <changeSet id="1" author="Maslov" runOnChange="false">
         <comment>Initiation</comment>
         <sql>
-            CREATE TABLE genres(
+            CREATE TABLE IF NOT EXISTS genres(
             id bigserial,
             name varchar(255) NOT NULL,
             PRIMARY KEY (id)
             );
 
-            CREATE TABLE year_of_publish (
+            CREATE TABLE IF NOT EXISTS year_of_publish (
             id bigserial,
             year varchar(255) NOT NULL,
             PRIMARY KEY (id)
             );
 
-            CREATE TABLE authors(
+            CREATE TABLE IF NOT EXISTS authors(
             id bigserial,
             author_name varchar(255) NOT NULL,
             PRIMARY KEY (id)
             );
 
-            CREATE TABLE books(
+            CREATE TABLE IF NOT EXISTS books(
             book_id bigserial,
             name varchar(255) NOT NULL,
             year_id bigint REFERENCES year_of_publish(id),
@@ -32,14 +32,14 @@
             PRIMARY KEY (book_id)
             );
 
-            CREATE TABLE comments(
+            CREATE TABLE IF NOT EXISTS comments(
             comment_id bigserial,
             book_id bigint REFERENCES books(book_id) ON DELETE CASCADE NOT NULL,
             comment_book varchar(255),
             PRIMARY KEY (comment_id)
             );
 
-            CREATE TABLE books_authors(
+            CREATE TABLE IF NOT EXISTS books_authors(
             book_id bigint REFERENCES books(book_id) ON DELETE CASCADE,
             author_id  bigint REFERENCES authors(id),
             PRIMARY KEY (book_id, author_id)

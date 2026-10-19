@@ -9,7 +9,7 @@ import jakarta.validation.constraints.NotNull;
 
 import java.io.Serializable;
 
-public record BookDto (
+public record BookDto(
         Long id,
         @NotBlank String title,
         @NotBlank String authors,
@@ -17,5 +17,6 @@ public record BookDto (
         @NotNull @ExistingId(entityClass = Genre.class) Long genreId) implements Serializable {
 
     @JsonCreator
-    public BookDto {}
+    public BookDto {
+    }
 }

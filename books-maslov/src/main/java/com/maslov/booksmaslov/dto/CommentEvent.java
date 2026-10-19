@@ -4,4 +4,5 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public record CommentEvent(
         @JsonProperty("book_id") long bookId,
-        @JsonProperty("comment") String comment) {}
+        @JsonProperty("comment") String comment) {
+}

@@ -53,8 +53,6 @@ public class Book {
 
     @Getter
     @OneToMany(mappedBy = "book", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    //@JsonManagedReference // Этот список БУДЕТ включен в JSON книги
-    //указываем, если коммент не должен знать о книге @JoinColumn(name = "book_id")
     private Set<Comment> comments = new HashSet<>();
 
     public void addComment(Comment child) {

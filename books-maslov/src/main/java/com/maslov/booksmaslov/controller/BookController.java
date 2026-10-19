@@ -63,7 +63,7 @@ public class BookController {
 
     @PostMapping("/{bookId}/comment")
     public ResponseEntity<Void> createComment(@PathVariable long bookId,
-                                                    @Valid @RequestBody CommentRequest comment) {
+                                              @Valid @RequestBody CommentRequest comment) {
         CommentEvent commentEvent = new CommentEvent(bookId, comment.text());
         kafkaProducerService.sendCommentEvent(commentEvent);
         return ResponseEntity.status(HttpStatus.CREATED).build();
