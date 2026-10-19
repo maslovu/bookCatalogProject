@@ -71,15 +71,15 @@ class BookServiceImplTest {
 
         savedEntity = new Book();
         savedEntity.setId(42L);
-        savedEntity.setTitle("Effective Java");
-        savedEntity.setAuthors(Set.of(new Author("Test")));
+        savedEntity.setTitle("Clean Code");
+        savedEntity.setAuthors(Set.of(new Author("Author A"), new Author("Author B")));
 
         freshCopyFromDb = new Book();
         freshCopyFromDb.setId(42L);
         freshCopyFromDb.setTitle("Effective Java");
         freshCopyFromDb.setAuthors(Set.of(new Author("Test")));
 
-        expectedDto = new BookDto(42L, "Effective Java", "Author A, Author B", 2L, 1L);
+        expectedDto = new BookDto(42L, "Clean Code", "Author A, Author B", 2L, 1L);
     }
 
     @Test
@@ -188,9 +188,8 @@ class BookServiceImplTest {
         // Given
         given(mapper.toEntity(bookDto)).willReturn(bookEntity);
         given(bookRepo.save(bookEntity)).willReturn(savedEntity);
-        given(bookRepo.findById(42L)).willReturn(Optional.of(freshCopyFromDb));
 
-        given(mapper.toDto(freshCopyFromDb)).willReturn(expectedDto);
+        given(mapper.toDto(savedEntity)).willReturn(expectedDto);
 
         // When
         BookDto result = bookService.createBook(bookDto);
@@ -198,11 +197,10 @@ class BookServiceImplTest {
         // Then
         assertNotNull(result);
         assertEquals(42L, result.id());
-        assertEquals("Effective Java", result.title());
+        assertEquals("Clean Code", result.title());
 
         verify(mapper).toEntity(bookDto);
         verify(bookRepo).save(bookEntity);
-        verify(bookRepo).findById(42L);
     }
 
     @Test void createBook_WithAuthors_AuthorsAreProcessed() {
@@ -216,8 +214,7 @@ class BookServiceImplTest {
 
         given(mapper.toEntity(dtoWithAuthors)).willReturn(bookEntity);
         given(bookRepo.save(bookEntity)).willReturn(savedEntity);
-        given(bookRepo.findById(42L)).willReturn(Optional.of(freshCopyFromDb));
-        given(mapper.toDto(freshCopyFromDb)).willReturn(expectedDto);
+        given(mapper.toDto(savedEntity)).willReturn(expectedDto);
 
         // When
         BookDto result = bookService.createBook(dtoWithAuthors);
@@ -228,8 +225,7 @@ class BookServiceImplTest {
 
         verify(mapper, times(1)).toEntity(dtoWithAuthors);
         verify(bookRepo, times(1)).save(bookEntity);
-        verify(bookRepo, times(1)).findById(42L);
-        verify(mapper, times(1)).toDto(freshCopyFromDb);
+        verify(mapper, times(1)).toDto(savedEntity);
     }
 
     @Test
