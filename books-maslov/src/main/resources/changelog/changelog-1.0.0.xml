@@ -3,10 +3,50 @@
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                     https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.4.xsd">
-<!--    <changeSet id="1" author="Maslov" runOnChange="false">-->
-<!--        <comment>Initiation</comment>-->
+    <changeSet id="1" author="Maslov" runOnChange="false">
+        <comment>Initiation</comment>
+        <sql>
+            CREATE TABLE IF NOT EXISTS genres(
+            id bigserial,
+            name varchar(255) NOT NULL,
+            PRIMARY KEY (id)
+            );
 
-<!--        <sqlFile dbms="postgresql" encoding="UTF-8" stripComments="false" splitStatements="false"-->
-<!--                 path="tables/book.sql" relativeToChangelogFile="true"/>-->
-<!--    </changeSet>-->
+            CREATE TABLE IF NOT EXISTS year_of_publish (
+            id bigserial,
+            year varchar(255) NOT NULL,
+            PRIMARY KEY (id)
+            );
+
+            CREATE TABLE IF NOT EXISTS authors(
+            id bigserial,
+            author_name varchar(255) NOT NULL,
+            PRIMARY KEY (id)
+            );
+
+            CREATE TABLE IF NOT EXISTS books(
+            book_id bigserial,
+            name varchar(255) NOT NULL,
+            year_id bigint REFERENCES year_of_publish(id),
+            genre_id bigint REFERENCES genres(id),
+            PRIMARY KEY (book_id)
+            );
+
+            CREATE TABLE IF NOT EXISTS comments(
+            comment_id bigserial,
+            book_id bigint REFERENCES books(book_id) ON DELETE CASCADE NOT NULL,
+            comment_book varchar(255),
+            PRIMARY KEY (comment_id)
+            );
+
+            CREATE TABLE IF NOT EXISTS books_authors(
+            book_id bigint REFERENCES books(book_id) ON DELETE CASCADE,
+            author_id  bigint REFERENCES authors(id),
+            PRIMARY KEY (book_id, author_id)
+            );
+
+            INSERT INTO year_of_publish (id, year) VALUES (1, '2026'), (2, '2025'), (3, '2024') ON CONFLICT DO NOTHING;
+            INSERT INTO genres (id, name) VALUES (1, 'Фантастика'), (2, 'Классика'), (3, 'Архитектура') ON CONFLICT DO NOTHING;
+        </sql>
+    </changeSet>
 </databaseChangeLog>

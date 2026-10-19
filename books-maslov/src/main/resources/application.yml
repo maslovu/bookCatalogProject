@@ -1,7 +1,7 @@
 spring:
   datasource:
-#    url: jdbc:postgresql://postgres-service:5432/otus
-    url: jdbc:postgresql://localhost:5432/otus
+    url: jdbc:postgresql://postgres-service:5432/otus
+#    url: jdbc:postgresql://localhost:5432/otus
     username: postgres
     password: postgres
     driver-class-name: org.postgresql.Driver
@@ -19,7 +19,7 @@ spring:
     redis:
       host: redis-service
       port: 6379
-      password: ${REDIS_PASSWORD}
+      password: ${REDIS_PASSWORD:}
       timeout: 2000ms
       connect-timeout: 2000ms
       jedis:
@@ -29,7 +29,7 @@ spring:
   cache:
     type: redis
     redis:
-      time-to-live: 60000 # TTL 10 минут (пример)
+      time-to-live: 600000 # TTL 10 минут (пример)
 
 
   jpa:
@@ -40,6 +40,7 @@ spring:
         jdbc.batch_size: 30
         order_inserts: true
         order_updates: true
+        ddl-auto: none
 
 management:
   server:

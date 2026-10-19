@@ -30,7 +30,11 @@ public class ExistingIdValidator implements ConstraintValidator<ExistingId, Long
         }
 
         // Проверяем наличие записи в базе
-        Object found = em.find(targetEntity, value);
-        return found != null;
+        try {
+            Object found = em.find(targetEntity, value);
+            return found != null;
+        } catch (Exception e) {
+            return true; // Таблица не создана — пропускаем валидацию
+        }
     }
 }

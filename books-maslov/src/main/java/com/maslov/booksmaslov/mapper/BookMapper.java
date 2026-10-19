@@ -24,13 +24,12 @@ public interface BookMapper {
     @Mapping(source = "year.id", target = "yearId")
     BookDto toDto(Book entity);
 
-    // Метод преобразования Set<String> в одну строку через разделитель
     default String mapAuthors(Set<Author> authors) {
         if (authors == null || authors.isEmpty()) {
             return "";
         }
         return authors.stream()
-                .map(Author::getName) // Берем имя автора
+                .map(Author::getName)
                 .collect(Collectors.joining(", "));
     }
 
@@ -41,11 +40,11 @@ public interface BookMapper {
 
     default Set<Author> stringToAuthors(String source) {
         if (source == null || source.isBlank()) {
-            return Collections.emptySet(); }
-        // Разделяем строку по запятой, убираем лишние пробелы и создаем объекты
+            return Collections.emptySet();
+        }
         return Arrays.stream(source.split(","))
                 .map(String::trim)
-                .map(Author::new) // Предполагаем, что у Author есть конструктор (id, name)
+                .map(Author::new)
                 .collect(Collectors.toSet());
     }
 

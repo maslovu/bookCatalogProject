@@ -13,4 +13,5 @@ import java.lang.annotation.Target;
 @Caching(evict = {
         @CacheEvict(value = "book", allEntries = true)
 })
-public @interface EvictBookCache {}
+public @interface EvictBookCache {
+}
