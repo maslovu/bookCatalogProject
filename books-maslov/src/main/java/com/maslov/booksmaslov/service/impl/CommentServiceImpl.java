@@ -50,6 +50,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @Transactional(readOnly = true)
     public List<CommentDto> getAllCommentForBook(long bookId) {
+        log.info("Getting comments for book with id: {}", bookId);
         return commentRepo.getCommentsForBookByBookId(bookId).stream()
                 .map(mapper::toDto).toList();
     }
