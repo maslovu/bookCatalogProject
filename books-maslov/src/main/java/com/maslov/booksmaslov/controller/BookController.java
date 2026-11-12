@@ -4,6 +4,7 @@ import com.maslov.booksmaslov.dto.BookDto;
 import com.maslov.booksmaslov.dto.CommentDto;
 import com.maslov.booksmaslov.dto.CommentEvent;
 import com.maslov.booksmaslov.dto.CommentRequest;
+import com.maslov.booksmaslov.service.BookAiService;
 import com.maslov.booksmaslov.service.BookService;
 import com.maslov.booksmaslov.service.CommentProcessingService;
 import com.maslov.booksmaslov.service.CommentService;
@@ -30,12 +31,14 @@ public class BookController {
     private final CommentService commentService;
     private final CommentProcessingService commentProcessingService;
     private final KafkaProducerService kafkaProducerService;
+    private final BookAiService bookAiService;
 
-    public BookController(BookService service, CommentService commentService, CommentProcessingService commentProcessingService, KafkaProducerService kafkaProducerService) {
+    public BookController(BookService service, CommentService commentService, CommentProcessingService commentProcessingService, KafkaProducerService kafkaProducerService, BookAiService bookAiService) {
         this.bookService = service;
         this.commentService = commentService;
         this.commentProcessingService = commentProcessingService;
         this.kafkaProducerService = kafkaProducerService;
+        this.bookAiService = bookAiService;
     }
 
     @GetMapping
@@ -54,6 +57,13 @@ public class BookController {
     public ResponseEntity<List<CommentDto>> getCommentsForBook(@PathVariable long bookId) {
         List<CommentDto> comments = commentService.getAllCommentForBook(bookId);
         return ResponseEntity.ok(comments);
+    }
+
+    @GetMapping("/{bookId}/ai-description")
+    public ResponseEntity<String> getAiDescription(@PathVariable long bookId) {
+        BookDto book = bookService.getBook(bookId);
+        String description = bookAiService.generateBookDescription(book.title(), book.authors(), book.genreId().toString());
+        return ResponseEntity.ok(description);
     }
 
     @PostMapping
