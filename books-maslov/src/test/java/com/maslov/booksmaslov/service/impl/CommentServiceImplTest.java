@@ -8,6 +8,7 @@ import com.maslov.booksmaslov.exception.ResourceNotFoundException;
 import com.maslov.booksmaslov.mapper.CommentMapper;
 import com.maslov.booksmaslov.repository.BookRepo;
 import com.maslov.booksmaslov.repository.CommentRepo;
+import com.maslov.booksmaslov.service.BookAiService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,8 +16,11 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -28,6 +32,8 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -46,6 +52,9 @@ class CommentServiceImplTest {
 
     @Mock
     private CommentMapper mapper;
+
+    @Mock
+    private BookAiService bookAiService;
 
     @InjectMocks
     private CommentServiceImpl commentService;
@@ -75,60 +84,65 @@ class CommentServiceImplTest {
     }
 
     @Test
-    void getAllCommentForBook_WhenCommentsExist_ReturnsListOfDtos() {
+    void getAllCommentForBook_WhenCommentsExist_ReturnsPagedDtos() {
         // Given
         long bookId = 42L;
+        int page = 0;
+        int size = 10;
+        Sort sort = Sort.by("id").descending();
 
         Comment c1 = new Comment("Nice!");
         Comment c2 = new Comment("Bad...");
 
         List<Comment> dbResponse = List.of(c1, c2);
+        Page<Comment> pageResponse = new PageImpl<>(dbResponse);
 
         CommentDto dto1 = new CommentDto(1L, "Nice!", 3L);
         CommentDto dto2 = new CommentDto(2L, "Bad...", 3L);
 
-        given(commentRepo.findByBookId(bookId)).willReturn(dbResponse);
+        given(commentRepo.findByBookId(bookId, PageRequest.of(page, size, sort)))
+                .willReturn(pageResponse);
 
         given(mapper.toDto(c1)).willReturn(dto1);
         given(mapper.toDto(c2)).willReturn(dto2);
 
         // When
-        List<CommentDto> result = commentService.getAllCommentForBook(bookId);
+        Page<CommentDto> result = commentService.getAllCommentForBook(bookId, page, size);
 
         // Then
         assertNotNull(result);
-        assertEquals(2, result.size());
-        assertEquals("Nice!", result.get(0).text());
-        assertEquals("Bad...", result.get(1).text());
+        assertEquals(2, result.getContent().size());
+        assertEquals("Nice!", result.getContent().get(0).text());
+        assertEquals("Bad...", result.getContent().get(1).text());
 
-        verify(commentRepo).findByBookId(bookId);
+        verify(commentRepo).findByBookId(bookId, PageRequest.of(page, size, sort));
         verify(mapper).toDto(c1);
         verify(mapper).toDto(c2);
     }
 
     @Test
-    void getAllCommentForBook_NoComments_ReturnsEmptyList() {
+    void getAllCommentForBook_NoComments_ReturnsEmptyPage() {
         // Given
         long bookId = 99L;
-        given(commentRepo.findByBookId(bookId))
-                .willReturn(Collections.emptyList());
+        int page = 0;
+        int size = 10;
+        Sort sort = Sort.by("id").descending();
+        given(commentRepo.findByBookId(bookId, PageRequest.of(page, size, sort)))
+                .willReturn(Page.empty());
 
         // When
-        List<CommentDto> result = commentService.getAllCommentForBook(bookId);
+        Page<CommentDto> result = commentService.getAllCommentForBook(bookId, page, size);
 
         // Then
         assertNotNull(result);
+        assertTrue(result.getContent().isEmpty());
 
-        // Объект списка должен существовать
-        assertTrue(result.isEmpty());
-
-        verify(commentRepo).findByBookId(bookId);
-        verify(mapper, never()).toDto(any()); // Маппер не должен вызываться ни разу
+        verify(commentRepo).findByBookId(bookId, PageRequest.of(page, size, sort));
+        verify(mapper, never()).toDto(any());
     }
 
     @Test
     void createComment_ValidInput_ReturnsSavedDto() {
-
         // Given
         given(bookRepo.findById(bookId)).willReturn(Optional.of(bookEntity));
         given(commentRepo.save(any(Comment.class))).willReturn(savedComment);
@@ -159,10 +173,10 @@ class CommentServiceImplTest {
 
         assertEquals("Book/comment not found with id : " + nonExistentBookId, exception.getMessage());
 
-        // Верифицируем: поиск книги вызвался, а сохранение и маппинг проигнорированы
         verify(bookRepo, times(1)).findById(nonExistentBookId);
         verify(commentRepo, never()).save(any(Comment.class));
-        verifyNoInteractions(mapper);
+        verify(mapper, never()).toDto(any());
+        verify(bookAiService, never()).storeCommentEmbedding(anyString(), anyLong());
     }
 
     @Test
@@ -204,8 +218,6 @@ class CommentServiceImplTest {
         // Then
         assertEquals(newText, result.text());
 
-        // Проверка состояния самого объекта (State-based testing)
-        // Важно проверить, что поле изменилось ДО передачи в mapper
         assertEquals(newText, existingComment.getText());
 
         verify(commentRepo).findById(commentId);
@@ -227,7 +239,6 @@ class CommentServiceImplTest {
 
         assertTrue(ex.getMessage().contains("Comment not found"));
 
-        // Критическая проверка: если findById вернул пусто, то setText вызван быть не мог
         verify(commentRepo).findById(missingId);
         verify(mapper, never()).toDto(any());
     }
@@ -278,7 +289,7 @@ class CommentServiceImplTest {
         // When
         commentService.deleteComment(commentId, bookId);
 
-        // Then: Проверяем изменение состояния IN-MEMORY объектов
+        // Then
         assertTrue(parentBook.getComments().isEmpty(), "Коллекция комментариев книги должна стать пустой");
         assertNull(targetComment.getBook(), "Ссылка на книгу внутри комментария должна быть очищена");
     }

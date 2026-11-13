@@ -9,6 +9,8 @@ import com.maslov.booksmaslov.service.BookService;
 import com.maslov.booksmaslov.service.CommentProcessingService;
 import com.maslov.booksmaslov.service.CommentService;
 import com.maslov.booksmaslov.service.KafkaProducerService;
+import org.springframework.data.domain.Page;
+import org.springframework.web.bind.annotation.RequestParam;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/books")
@@ -53,17 +56,30 @@ public class BookController {
         return ResponseEntity.ok(book);
     }
 
-    @GetMapping("/{bookId}/comments")
-    public ResponseEntity<List<CommentDto>> getCommentsForBook(@PathVariable long bookId) {
-        List<CommentDto> comments = commentService.getAllCommentForBook(bookId);
-        return ResponseEntity.ok(comments);
-    }
-
     @GetMapping("/{bookId}/ai-description")
     public ResponseEntity<String> getAiDescription(@PathVariable long bookId) {
         BookDto book = bookService.getBook(bookId);
         String description = bookAiService.generateBookDescription(book.title(), book.authors(), book.genreId().toString());
         return ResponseEntity.ok(description);
+    }
+
+    @PostMapping("/ai/recommend")
+    public ResponseEntity<String> recommendBookByComment(@Valid @RequestBody Map<String, String> request) {
+        String userQuery = request.get("query");
+        if (userQuery == null || userQuery.isBlank()) {
+            return ResponseEntity.badRequest().body("Параметр 'query' обязателен");
+        }
+        String recommendation = bookAiService.recommendBookByComment(userQuery);
+        return ResponseEntity.ok(recommendation);
+    }
+
+    @GetMapping("/{bookId}/comments")
+    public ResponseEntity<Page<CommentDto>> getCommentsForBook(
+            @PathVariable long bookId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Page<CommentDto> comments = commentService.getAllCommentForBook(bookId, page, size);
+        return ResponseEntity.ok(comments);
     }
 
     @PostMapping

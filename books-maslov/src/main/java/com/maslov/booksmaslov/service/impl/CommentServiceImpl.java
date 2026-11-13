@@ -10,12 +10,18 @@ import com.maslov.booksmaslov.exception.ResourceNotFoundException;
 import com.maslov.booksmaslov.mapper.CommentMapper;
 import com.maslov.booksmaslov.repository.BookRepo;
 import com.maslov.booksmaslov.repository.CommentRepo;
+import com.maslov.booksmaslov.service.BookAiService;
 import com.maslov.booksmaslov.service.CommentService;
 import jakarta.persistence.EntityManager;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +34,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class CommentServiceImpl implements CommentService {
     private static final int FLUSH_THRESHOLD = 10;
 
@@ -35,24 +42,15 @@ public class CommentServiceImpl implements CommentService {
     private final CommentRepo commentRepo;
     private final CommentMapper mapper;
     private final EntityManager entityManager;
+    private final BookAiService bookAiService;
 
-    public CommentServiceImpl(BookRepo bookRepo,
-                              CommentRepo commentRepo,
-                              CommentMapper mapper,
-                              EntityManager entityManager) {
-        this.bookRepo = bookRepo;
-        this.commentRepo = commentRepo;
-        this.mapper = mapper;
-        this.entityManager = entityManager;
-    }
-
-    @Cacheable(value = "comments", key = "'comments::book::' + #bookId")
+    @Cacheable(value = "comments", key = "'comments::book::' + #bookId + '::' + #page + '::' + #size")
     @Override
     @Transactional(readOnly = true)
-    public List<CommentDto> getAllCommentForBook(long bookId) {
-        log.info("Getting comments for book with id: {}", bookId);
-        return commentRepo.findByBookId(bookId).stream()
-                .map(mapper::toDto).toList();
+    public Page<CommentDto> getAllCommentForBook(long bookId, int page, int size) {
+        log.info("Getting comments for book with id: {}, page: {}, size: {}", bookId, page, size);
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
+        return commentRepo.findByBookId(bookId, pageable).map(mapper::toDto);
     }
 
     @EvictCommentCache
@@ -64,6 +62,7 @@ public class CommentServiceImpl implements CommentService {
                 .orElseThrow(() -> new ResourceNotFoundException("Book/comment", bookId));
         book.addComment(newComment);
         Comment savedComment = commentRepo.save(newComment);
+        
         return mapper.toDto(savedComment);
     }
 
