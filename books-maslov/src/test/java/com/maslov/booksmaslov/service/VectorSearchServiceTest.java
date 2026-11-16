@@ -31,6 +31,7 @@ class VectorSearchServiceTest {
     @InjectMocks
     private VectorSearchService vectorSearchService;
 
+    @SuppressWarnings("unchecked")
     @Test
     void storeComment_WhenCalled_StoresDocumentInVectorStore() {
         // Given

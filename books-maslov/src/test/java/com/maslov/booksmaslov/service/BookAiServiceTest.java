@@ -1,6 +1,5 @@
 package com.maslov.booksmaslov.service;
 
-import com.maslov.booksmaslov.dto.BookDto;
 import com.maslov.booksmaslov.mapper.BookMapper;
 import com.maslov.booksmaslov.repository.BookRepo;
 import org.junit.jupiter.api.Test;
@@ -92,7 +91,6 @@ class BookAiServiceTest {
         );
         when(vectorSearchService.searchSimilarComments(userQuery, 5)).thenReturn(mockComments);
 
-        BookDto mockBook = new BookDto(1L, "Python编程", "Автор Б", 2L, 1L);
         when(bookRepo.findByIdIn(anyList())).thenReturn(List.of());
 
         when(chatClient.prompt()).thenReturn(requestSpec);
