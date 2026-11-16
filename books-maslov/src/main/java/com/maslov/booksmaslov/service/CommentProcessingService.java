@@ -30,6 +30,8 @@ public class CommentProcessingService {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void processWithRetry(List<CommentEvent> events) {
         commentService.createCommentFromBatch(events);
+
+        bookAiService.clearRecommendationCache();
         
         // Сохраняем эмбеддинги для RAG
         for (CommentEvent event : events) {

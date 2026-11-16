@@ -1,6 +1,5 @@
 package com.maslov.booksmaslov.service;
 
-import com.maslov.booksmaslov.domain.Comment;
 import com.maslov.booksmaslov.dto.BookDto;
 import com.maslov.booksmaslov.mapper.BookMapper;
 import com.maslov.booksmaslov.repository.BookRepo;
@@ -10,10 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -47,7 +42,7 @@ public class BookAiService {
         // 1. RETRIEVAL: ищем релевантные комментарии через vector search
         List<Map<String, Object>> relevantComments = vectorSearchService.searchSimilarComments(userQuery, 5);
         log.info("RAG: found {} similar comments", relevantComments.size());
-        
+
         if (relevantComments.isEmpty()) {
             return "Не удалось найти комментарии, релевантные вашему запросу. Попробуйте другой запрос.";
         }
@@ -91,11 +86,6 @@ public class BookAiService {
     @CacheEvict(value = "ai-recommendations", allEntries = true)
     public void clearRecommendationCache() {
         log.info("Cleared AI recommendation cache");
-    }
-
-    public Page<Comment> getCommentsForBook(long bookId, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
-        return commentRepo.findByBookId(bookId, pageable);
     }
 
     @CacheEvict(value = "ai-recommendations", allEntries = true)
