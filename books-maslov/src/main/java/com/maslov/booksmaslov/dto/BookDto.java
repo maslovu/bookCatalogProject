@@ -1,6 +1,5 @@
 package com.maslov.booksmaslov.dto;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.maslov.booksmaslov.domain.Genre;
 import com.maslov.booksmaslov.domain.YearOfPublish;
 import com.maslov.booksmaslov.validator.ExistingId;

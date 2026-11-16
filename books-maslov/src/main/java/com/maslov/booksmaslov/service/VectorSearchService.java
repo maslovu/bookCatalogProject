@@ -38,12 +38,15 @@ public class VectorSearchService {
                         .build()
         );
 
+        if (results == null) {
+            return List.of();
+        }
+
         return results.stream()
                 .map(r -> {
-                    var metadata = r.getMetadata();
                     Map<String, Object> result = new java.util.HashMap<>();
                     result.put("text", r.getText());
-                    result.put("bookId", metadata != null ? metadata.get("bookId") : null);
+                    result.put("bookId", r.getMetadata().get("bookId"));
                     result.put("score", r.getScore());
                     return result;
                 })

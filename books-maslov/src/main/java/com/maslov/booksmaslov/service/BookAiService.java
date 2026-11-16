@@ -3,7 +3,6 @@ package com.maslov.booksmaslov.service;
 import com.maslov.booksmaslov.dto.BookDto;
 import com.maslov.booksmaslov.mapper.BookMapper;
 import com.maslov.booksmaslov.repository.BookRepo;
-import com.maslov.booksmaslov.repository.CommentRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
@@ -21,7 +20,6 @@ import java.util.stream.Collectors;
 public class BookAiService {
 
     private final ChatClient chatClient;
-    private final CommentRepo commentRepo;
     private final BookRepo bookRepo;
     private final VectorSearchService vectorSearchService;
     private final BookMapper bookMapper;

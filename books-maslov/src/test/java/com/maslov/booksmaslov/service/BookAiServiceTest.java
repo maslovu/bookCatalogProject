@@ -3,7 +3,6 @@ package com.maslov.booksmaslov.service;
 import com.maslov.booksmaslov.dto.BookDto;
 import com.maslov.booksmaslov.mapper.BookMapper;
 import com.maslov.booksmaslov.repository.BookRepo;
-import com.maslov.booksmaslov.repository.CommentRepo;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -35,9 +34,6 @@ class BookAiServiceTest {
 
     @Mock
     private ChatClient.CallResponseSpec callResponseSpec;
-
-    @Mock
-    private CommentRepo commentRepo;
 
     @Mock
     private BookRepo bookRepo;
