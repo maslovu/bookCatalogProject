@@ -24,6 +24,9 @@ spec:
             - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
               value: "kafka-service:9092"
 
+            - name: SPRING_AI_VECTORSTORE_PGVECTOR_INITIALIZE-SCHEMA
+              value: "true"
+
             - name: SPRING_DATASOURCE_URL
               value: "jdbc:postgresql://postgres-service:5432/otus"
             - name: SPRING_DATASOURCE_USERNAME
