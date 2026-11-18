@@ -16,13 +16,16 @@ spec:
     spec:
       containers:
         - name: api-app-container
-          image: books-maslov-2.2.1:1.0
+          image: books-maslov:latest
           imagePullPolicy: IfNotPresent # Важно для локальной разработки
           ports:
             - containerPort: 8080
           env:
             - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
               value: "kafka-service:9092"
+
+            - name: SPRING_AI_VECTORSTORE_PGVECTOR_INITIALIZE-SCHEMA
+              value: "true"
 
             - name: SPRING_DATASOURCE_URL
               value: "jdbc:postgresql://postgres-service:5432/otus"

@@ -1,0 +1,13 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                    https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.4.xsd">
+    <changeSet id="3" author="Maslov">
+        <comment>Update genres with more specific categories</comment>
+        <sql>
+            UPDATE genres SET name = 'Техническая литература' WHERE id = 1;
+            UPDATE genres SET name = 'Программирование' WHERE id = 2;
+        </sql>
+    </changeSet>
+</databaseChangeLog>

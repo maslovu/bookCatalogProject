@@ -3,12 +3,13 @@ package com.maslov.booksmaslov.service;
 import com.maslov.booksmaslov.dto.CommentDto;
 import com.maslov.booksmaslov.dto.CommentEvent;
 import com.maslov.booksmaslov.dto.CommentRequest;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
 public interface CommentService {
 
-    List<CommentDto> getAllCommentForBook(long bookId);
+    Page<CommentDto> getAllCommentForBook(long bookId, int page, int size);
 
     CommentDto createComment(CommentRequest comment, long bookId);
 

@@ -3,9 +3,10 @@ package com.maslov.booksmaslov.repository;
 import com.maslov.booksmaslov.domain.Comment;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface CommentRepo extends JpaRepository<Comment, Long> {
 
-    List<Comment> findByBookId(long bookId);
+    Page<Comment> findByBookId(long bookId, Pageable pageable);
 }

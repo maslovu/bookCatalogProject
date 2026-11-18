@@ -17,4 +17,6 @@ public interface BookRepo extends JpaRepository<Book, Long> {
     //Ищет книгу и гарантированно подтягивает авторов/жанр одним запросом
     @EntityGraph(attributePaths = {"genre", "year", "authors"})
     Optional<Book> findById(Long id);
+
+    List<Book> findByIdIn(List<Long> ids);
 }

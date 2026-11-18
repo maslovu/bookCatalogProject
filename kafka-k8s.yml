@@ -63,6 +63,14 @@ spec:
               value: "1"
             - name: KAFKA_TRANSACTION_STATE_LOG_MIN_ISR
               value: "1"
+            - name: KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR
+              value: "1"
+            - name: KAFKA_TRANSACTION_STATE_LOG_MIN_ISR
+              value: "1"
+            - name: KAFKA_DEFAULT_REPLICATION_FACTOR
+              value: "1"
+            - name: KAFKA_MIN_INSYNC_REPLICAS
+              value: "1"
           volumeMounts:
             - name: kafka-storage
               mountPath: /var/lib/kafka/data
